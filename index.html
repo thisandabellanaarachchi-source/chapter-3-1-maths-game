@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Maths Quest — Chapter 3.1</title>
+<style>
+:root{color-scheme:dark;font:16px system-ui;color:#edf2ff;background:#0b1020}*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#1c2a50,#0b1020 65%);min-height:100vh}main{max-width:850px;margin:auto;padding:24px 16px}.card{background:#151d31;border:1px solid #2d3a57;border-radius:18px;padding:20px;margin:14px 0}.muted{color:#aab6ce}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}.btn{background:#1c2740;color:inherit;border:1px solid #354361;border-radius:12px;padding:13px;text-align:left;width:100%;margin:5px 0;cursor:pointer;font:inherit}.btn:hover{border-color:#9aaaff}.primary{background:#9aaaff;color:#10172b;border:0;border-radius:12px;padding:12px 18px;font-weight:700;cursor:pointer}.correct{border-color:#31c48d;background:#12392f}.wrong{border-color:#ff6b78;background:#45232d}.bar{height:8px;background:#303b55;border-radius:9px;overflow:hidden;margin:9px 0}.bar span{display:block;height:100%;background:#9aaaff;width:0}.row{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}.stat{background:#1c2740;border-radius:12px;padding:10px;text-align:center;flex:1}.hidden{display:none!important}.step{border-left:3px solid #9aaaff;padding:5px 0 5px 12px;margin:8px 0}button:disabled{opacity:.8}
+</style><main>
+<section class="card"><div class="row"><div><small class="muted">INTERACTIVE STUDY ARENA</small><h1>Maths Quest 3.1</h1><div class="muted">Functions · Limits · Continuity</div></div><div><small class="muted">TOTAL XP</small><h1 id="xp">0</h1></div></div><div class="row"><span id="level">Level 1 · Beginner</span><span id="streak">0 streak</span></div><div class="bar"><span id="lvbar"></span></div><div class="row"><div class="stat"><b id="answered">0</b><br><small>Answered</small></div><div class="stat"><b id="accuracy">—</b><br><small>Accuracy</small></div><div class="stat"><b id="best">0</b><br><small>Best streak</small></div></div></section>
+<section id="menu"><h2>Choose your challenge</h2><div id="topics" class="grid"></div><p class="muted">Five questions per round · 20 XP per correct answer · Progress saved in this browser.</p></section>
+<section id="game" class="hidden"><div class="row"><b id="topic"></b><span id="count" class="muted"></span></div><div class="bar"><span id="progress"></span></div><div class="card"><small class="muted">QUESTION</small><h2 id="question"></h2><div id="options"></div><p id="hint" class="muted hidden"></p><div id="feedback" class="hidden"></div><div class="row"><button id="hintbtn" class="btn" style="width:auto">Show hint</button><button id="next" class="primary hidden">Next →</button></div></div><button id="back" class="btn" style="width:auto">← Topics</button></section>
+<section id="result" class="hidden"><div class="card"><h1 id="resulttitle">Round complete</h1><h2 id="score"></h2><p id="summary" class="muted"></p></div><div class="card"><h2>Review</h2><div id="review"></div></div><button id="again" class="primary">Play again</button> <button id="home" class="btn" style="width:auto">Topics</button></section>
+</main><script>
+const data={
+"Functions & mappings":[
+["What is the image of f if its outputs are a,b,b?",["{a,b}","{a,b,c}","{1,2,3}","{b}"],0,"The image is the set of actual outputs.",["List outputs: a,b,b.","Remove repetition.","Image = {a,b}."]],
+["For f(x)=x² over ℝ, what is the preimage of 4?",["{2}","{−2}","{−2,2}","{4}"],2,"Solve x²=4.",["Set x²=4.","Take square roots: x=±2.","Preimage = {−2,2}."]],
+["If codomain={1,2,3} and image={1,2}, is f surjective?",["Yes","No","Only if injective","Cannot tell"],1,"Surjective means every codomain value is reached.",["3 is in the codomain.","3 is not in the image.","Therefore not surjective."]],
+["If f(x)=2x+1, find f(3).",["5","6","7","8"],2,"Substitute x=3.",["f(3)=2(3)+1.","6+1=7."]],
+["If f(x)=x+2 and g(x)=3x, find (g∘f)(2).",["8","10","12","14"],2,"Apply f first.",["f(2)=4.","g(4)=12."]]],
+"Function properties":[
+["A function is injective when…",["Every codomain value is reached","Different inputs have different outputs","It is constant","It is periodic"],1,"Injective means one-to-one.",["Assume f(x₁)=f(x₂).","Injectivity implies x₁=x₂."]],
+["Which function ℝ→ℝ is injective?",["x²","|x|","2x+1","5"],2,"A non-constant linear function is injective.",["2x₁+1=2x₂+1.","Rearrange to x₁=x₂."]],
+["Surjective means…",["Image equals codomain","Domain equals codomain","Function is increasing","No zeros"],0,"All codomain values must be reached.",["Every y in the codomain has a preimage.","Thus image=codomain."]],
+["Bijective means…",["Injective only","Surjective only","Both","Neither"],2,"A bijection has both properties.",["Injective: unique outputs for distinct inputs.","Surjective: all codomain values reached."]],
+["Is x²:ℝ→[0,∞) bijective?",["Yes","No, not injective","No, not surjective","Neither"],1,"Compare f(2) and f(−2).",["Both equal 4.","So it is not injective.","It is surjective onto [0,∞), but not bijective."]]],
+"Real functions":[
+["Domain of √(x−3)?",["ℝ","[3,∞)","(3,∞)","(−∞,3]"],1,"The radicand must be non-negative.",["x−3≥0.","Therefore x≥3."]],
+["Domain of 1/(x−5)?",["ℝ","ℝ\\{5}","[5,∞)","ℝ\\{0}"],1,"Denominator cannot be zero.",["x−5≠0.","So x≠5."]],
+["Zeros of x²−9?",["{−3,3}","{9}","{−9,9}","{0,3}"],0,"Set expression equal to zero.",["x²−9=0.","(x−3)(x+3)=0.","x=±3."]],
+["A function is even if…",["f(−x)=−f(x)","f(−x)=f(x)","f(x+T)=f(x)","f(x)=0"],1,"Even functions are y-axis symmetric.",["Replace x with −x.","If unchanged, it is even."]],
+["Which is strictly increasing on ℝ?",["−x","x²","3x+2","7"],2,"Positive linear slope means increasing.",["Slope is 3.","3>0, so it is strictly increasing."]]],
+"Inverses & composition":[
+["If f(x)=3x−6, find f⁻¹(x).",["(x−6)/3","(x+6)/3","3x+6","6−3x"],1,"Swap x and y, then solve.",["y=3x−6.","y+6=3x.","x=(y+6)/3."]],
+["Inverse of x² restricted to [0,∞)?",["√x","−√x","±√x","x²"],0,"The original x is non-negative.",["y=x².","x=±√y, but x≥0.","Choose √y."]],
+["If f(x)=x+4 and g(x)=2x, find (f∘g)(3).",["7","10","14","18"],1,"Apply g first.",["g(3)=6.","f(6)=10."]],
+["If f is bijective, then…",["f⁻¹(f(x))=x","f⁻¹(x)=f(x)","f(x)=0","f⁻¹(f(x))=0"],0,"Inverse reverses the original mapping.",["Apply f, then f⁻¹.","You recover x."]],
+["If f(x)=2x and g(x)=x+3, find f(g(x)).",["2x+3","2x+6","2x−3","x+6"],1,"Substitute g(x) into f.",["f(u)=2u.","Set u=x+3.","Result =2x+6."]]],
+"Limits":[
+["lim x→2 (x²−4)/(x−2) =",["0","2","4","Does not exist"],2,"Factorise the numerator.",["x²−4=(x−2)(x+2).","Cancel x−2.","Substitute 2: result 4."]],
+["lim x→3 (x²−9)/(x−3) =",["3","6","9","Does not exist"],1,"Use difference of squares.",["x²−9=(x−3)(x+3).","Cancel and substitute 3.","Result 6."]],
+["lim x→∞ (2x²+1)/(x²−3) =",["0","1","2","∞"],2,"Divide by highest power x².",["Divide top and bottom by x².","Terms 1/x² and 3/x² tend to zero.","Limit is 2."]],
+["lim x→0 sin(x)/x in radians =",["0","1","∞","Does not exist"],1,"Fundamental trigonometric limit.",["The standard limit is 1.","Angles must be in radians."]],
+["lim x→0 (√(x+4)−2)/x =",["0","1/2","1/4","2"],2,"Multiply by the conjugate.",["Multiply by √(x+4)+2.","Cancel x after difference of squares.","Substitute 0: 1/4."]]],
+"Continuity":[
+["Continuous at x=a means…",["f(a) undefined","Limit exists and equals f(a)","Always increasing","No zeros"],1,"Three conditions must hold.",["f(a) is defined.","The limit exists.","The limit equals f(a)."]],
+["Is 1/x continuous at x=0?",["Yes","No, undefined","Limit is zero","Only right"],1,"Check function value.",["Denominator is zero at 0.","Function is undefined there."]],
+["Is x² continuous at x=2?",["Yes","No","Only left","No limit"],0,"Polynomials are continuous everywhere.",["f(2)=4.","Limit is 4.","They are equal."]],
+["IVT requires a function to be…",["Continuous on [a,b]","Discontinuous","Strictly decreasing","Defined only at endpoints"],0,"Continuity over the whole interval is essential.",["Function is continuous on [a,b].","It takes all values between endpoint values."]],
+["If continuous f(1)=−2 and f(3)=4, what follows?",["No zero","At least one zero between 1 and 3","Exactly two zeros","Increasing"],1,"Use the Intermediate Value Theorem.",["Zero lies between −2 and 4.","Continuity guarantees at least one root in (1,3)."]]]
+};
+const $=id=>document.getElementById(id);let mode="",qs=[],i=0,score=0,answers=[],locked=false,stats={xp:0,answered:0,correct:0,streak:0,best:0};
+try{stats={...stats,...JSON.parse(localStorage.getItem("mq31")||"{}")}}catch(e){}
+function save(){localStorage.setItem("mq31",JSON.stringify(stats))}
+function update(){ $("xp").textContent=stats.xp;$("answered").textContent=stats.answered;$("accuracy").textContent=stats.answered?Math.round(stats.correct/stats.answered*100)+"%":"—";$("best").textContent=stats.best;$("streak").textContent=stats.streak+" correct streak";let l=Math.floor(stats.xp/100)+1;$("level").textContent="Level "+l+" · "+(l===1?"Beginner":l===2?"Learner":l===3?"Problem solver":"Maths master");$("lvbar").style.width=stats.xp%100+"%"}
+function view(id){["menu","game","result"].forEach(x=>$(x).classList.toggle("hidden",x!==id))}
+function shuffle(a){a=[...a];for(let n=a.length-1;n>0;n--){let j=Math.floor(Math.random()*(n+1));[a[n],a[j]]=[a[j],a[n]]}return a}
+$("topics").innerHTML=[...Object.keys(data),"Mixed challenge"].map((n,k)=>'<button class="btn" data-topic="'+k+'"><b>'+String(k+1).padStart(2,"0")+' · '+n+'</b><small class="muted">'+(k===6?"Questions from every topic":"Five-question practice round")+'</small></button>').join("");
+document.querySelectorAll("[data-topic]").forEach(b=>b.onclick=()=>start(+b.dataset.topic));
+function start(k){mode=Object.keys(data)[k]||"Mixed challenge";let all=k===6?Object.values(data).flat():data[mode];qs=shuffle(all).slice(0,5);i=0;score=0;answers=[];view("game");render()}
+function render(){locked=false;let q=qs[i];$("topic").textContent=mode;$("count").textContent="Question "+(i+1)+" / 5";$("progress").style.width=i/5*100+"%";$("question").textContent=q[0];$("options").innerHTML=q[1].map((v,j)=>'<button class="btn" data-i="'+j+'">'+ "ABCD"[j]+". "+v+"</button>").join("");$("options").querySelectorAll("button").forEach(b=>b.onclick=()=>answer(+b.dataset.i));$("feedback").classList.add("hidden");$("hint").classList.add("hidden");$("hintbtn").disabled=false;$("next").classList.add("hidden")}
+function answer(n){if(locked)return;locked=true;let q=qs[i],right=q[5]??q[2],ok=n===right;stats.answered++;if(ok){score++;stats.correct++;stats.xp+=20;stats.streak++;stats.best=Math.max(stats.best,stats.streak)}else stats.streak=0;save();update();$("options").querySelectorAll("button").forEach((b,j)=>{b.disabled=true;if(j===right)b.classList.add("correct");if(j===n&&!ok)b.classList.add("wrong")});$("feedback").classList.remove("hidden");$("feedback").innerHTML='<b>'+(ok?"Correct! +20 XP":"Not quite — review the solution")+'</b><p>'+(ok?"Good work.":"Correct answer: "+q[1][right])+'</p><b>Step-by-step explanation</b>'+q[4].map((s,j)=>'<div class="step"><b>Step '+(j+1)+':</b> '+s+'</div>').join("");$("next").textContent=i===4?"Finish round →":"Next question →";$("next").classList.remove("hidden");answers.push({q:q[0],ok,a:q[1][right]})}
+$("hintbtn").onclick=()=>{$("hint").textContent="Hint: "+qs[i][3];$("hint").classList.remove("hidden");$("hintbtn").disabled=true};
+$("next").onclick=()=>{if(++i===5)finish();else render()};
+function finish(){view("result");$("resulttitle").textContent=score===5?"Perfect round!":score>=3?"Good progress!":"Keep practising!";$("score").textContent=score+" / 5 correct";$("summary").textContent="You earned "+score*20+" XP. Total XP: "+stats.xp;$("review").innerHTML=answers.map((a,j)=>'<div class="step">'+(a.ok?"✓":"✗")+' <b>Question '+(j+1)+'</b><br>'+a.q+'<br><span class="muted">Correct answer: '+a.a+'</span></div>').join("")}
+$("back").onclick=()=>view("menu");$("home").onclick=()=>view("menu");$("again").onclick=()=>start(Object.keys(data).indexOf(mode));update();view("menu");
+</script></main></html>
