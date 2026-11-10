@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#10140f">
+<title>Dragon Banana Snake</title>
+<style>
+:root{color-scheme:dark;--bg:#10140f;--panel:#1b241a;--line:#344333;--gold:#f4c95d;--green:#8bd16d;--muted:#aab5a2}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 50% -10%,#35472b 0,#182218 42%,#0d120e 100%);font:16px system-ui,-apple-system,Segoe UI,sans-serif;color:#f4f4e9;display:flex;justify-content:center;padding:24px 14px 36px}
+main{width:min(760px,100%)}header{text-align:center;margin:4px 0 18px}h1{font-size:clamp(2rem,7vw,3.2rem);line-height:1;margin:8px 0;color:#f5d879;letter-spacing:-1.5px;text-shadow:0 3px 24px #d59b3544}.subtitle{color:#bdc9b4;margin:10px 0 0}
+.hud{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}.stat{background:#1b241a;border:1px solid var(--line);border-radius:14px;padding:10px 14px;text-align:center}.stat small{display:block;color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:1.3px}.stat strong{font-size:1.55rem;color:#fff3c3;font-variant-numeric:tabular-nums}
+.game-shell{position:relative;padding:10px;background:linear-gradient(145deg,#34432d,#172018);border:1px solid #56684a;border-radius:20px;box-shadow:0 18px 55px #0008}.stage{position:relative;overflow:hidden;border-radius:12px;background:#111a13;line-height:0}canvas{display:block;width:100%;height:auto;aspect-ratio:1/1;touch-action:none}.overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#071009b8;backdrop-filter:blur(4px);padding:20px;text-align:center}.overlay.hidden{display:none}.dialog{max-width:360px}.dialog .dragon{font-size:3.5rem;line-height:1.3}.dialog h2{margin:6px 0;color:#ffe18b;font-size:1.7rem}.dialog p{color:#d0d9c8;line-height:1.5;margin:8px 0 18px}
+button{border:0;border-radius:12px;padding:12px 19px;background:linear-gradient(135deg,#f5d66e,#dc9e36);color:#241b0a;font-weight:800;font-size:1rem;cursor:pointer;box-shadow:0 4px 0 #986523;transition:transform .1s,filter .1s}button:active{transform:translateY(2px);box-shadow:0 2px 0 #986523}button.secondary{background:#2b3b29;color:#eaf3df;border:1px solid #52664a;box-shadow:none}.actions{display:flex;justify-content:center;gap:10px;margin:14px 0 4px;flex-wrap:wrap}
+.hint{text-align:center;color:#aebba5;font-size:.88rem;margin:14px 0}.hint kbd{background:#293629;border:1px solid #52634d;border-radius:5px;padding:2px 6px;color:#f2e6bd}
+.mobile-controls{display:none;grid-template-columns:repeat(3,54px);grid-template-rows:repeat(2,48px);gap:5px;justify-content:center;margin:14px auto 0}.mobile-controls button{padding:0;font-size:1.2rem;border-radius:10px}.mobile-controls button:nth-child(1){grid-column:2;grid-row:1}.mobile-controls button:nth-child(2){grid-column:1;grid-row:2}.mobile-controls button:nth-child(3){grid-column:2;grid-row:2}.mobile-controls button:nth-child(4){grid-column:3;grid-row:2}
+footer{text-align:center;color:#778573;font-size:.78rem;margin-top:20px}
+@media(max-width:600px){body{padding:16px 10px 26px}.mobile-controls{display:grid}.stat{padding:8px 4px}.stat strong{font-size:1.25rem}.game-shell{padding:6px}}
+</style>
+</head>
+<body>
+<main>
+<header><div style="font-size:1.8rem">🐉 🍌 🐉</div><h1>Dragon Banana Snake</h1><p class="subtitle">Feast on bananas. Grow your dragon. Don't bite your tail.</p></header>
+<section class="hud" aria-label="Game statistics">
+<div class="stat"><small>Score</small><strong id="score">0</strong></div>
+<div class="stat"><small>Best</small><strong id="best">0</strong></div>
+<div class="stat"><small>Level</small><strong id="level">1</strong></div>
+</section>
+<div class="game-shell"><div class="stage">
+<canvas id="game" width="600" height="600" aria-label="Dragon Banana Snake game board"></canvas>
+<div class="overlay" id="overlay"><div class="dialog"><div class="dragon" id="overlayIcon">🐉</div><h2 id="overlayTitle">Ready, dragon?</h2><p id="overlayText">Collect bananas to grow longer. Avoid the walls and your own tail.</p><button id="startBtn">Start game</button></div></div>
+</div></div>
+<div class="actions"><button class="secondary" id="pauseBtn">Pause</button><button class="secondary" id="restartBtn">Restart</button></div>
+<div class="hint">Controls: <kbd>↑</kbd> <kbd>↓</kbd> <kbd>←</kbd> <kbd>→</kbd> or <kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> · <kbd>Space</kbd> to pause</div>
+<div class="mobile-controls" aria-label="Touch controls"><button class="secondary" data-dir="up">▲</button><button class="secondary" data-dir="left">◀</button><button class="secondary" data-dir="down">▼</button><button class="secondary" data-dir="right">▶</button></div>
+<footer>Dragon Banana Snake · A tiny arcade adventure</footer>
+</main>
+<script>
+(()=>{
+const canvas=document.getElementById('game'),ctx=canvas.getContext('2d'),N=20,C=30;
+const $=id=>document.getElementById(id);
+let dragon=[],banana={x:12,y:10},dir={x:1,y:0},next={x:1,y:0},score=0,best=Number(localStorage.getItem('dragonBananaBest')||0),level=1,running=false,over=false,last=0,acc=0,step=145;
+$('best').textContent=best;
+function reset(){dragon=[{x:8,y:10},{x:7,y:10},{x:6,y:10},{x:5,y:10}];dir={x:1,y:0};next={x:1,y:0};score=0;level=1;step=145;over=false;running=false;acc=0;placeBanana();hud();draw()}
+function hud(){$('score').textContent=score;$('best').textContent=best;$('level').textContent=level}
+function placeBanana(){let p;do{p={x:Math.floor(Math.random()*N),y:Math.floor(Math.random()*N)}}while(dragon.some(s=>s.x===p.x&&s.y===p.y));banana=p}
+function setDir(x,y){if(x===-dir.x&&y===-dir.y)return;next={x,y}}
+function show(title,txt,icon,button){$('overlayTitle').textContent=title;$('overlayText').textContent=txt;$('overlayIcon').textContent=icon;$('startBtn').textContent=button;$('overlay').classList.remove('hidden')}
+function hide(){ $('overlay').classList.add('hidden')}
+function start(){if(over)reset();running=true;hide();last=0;requestAnimationFrame(loop)}
+function pause(){if(!running||over)return;running=false;show('Taking a breather?','Your dragon is waiting. Resume when ready.','⏸️','Resume')}
+function end(){running=false;over=true;show('Game over!','You collected '+score+' '+(score===1?'banana':'bananas')+'. Give it another go!','🐲','Play again')}
+function update(){dir=next;const h={x:dragon[0].x+dir.x,y:dragon[0].y+dir.y};if(h.x<0||h.x>=N||h.y<0||h.y>=N||dragon.slice(0,-1).some(s=>s.x===h.x&&s.y===h.y)){end();return}dragon.unshift(h);if(h.x===banana.x&&h.y===banana.y){score+=10;level=1+Math.floor(score/50);step=Math.max(65,145-(level-1)*10);if(score>best){best=score;localStorage.setItem('dragonBananaBest',best)}placeBanana();hud()}else dragon.pop()}
+function round(x,y,w,h,r){ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fill()}
+function draw(){ctx.clearRect(0,0,600,600);ctx.fillStyle='#111a13';ctx.fillRect(0,0,600,600);
+for(let y=0;y<N;y++)for(let x=0;x<N;x++){if((x+y)%2===0){ctx.fillStyle='#172319';ctx.fillRect(x*C,y*C,C,C)}}
+ctx.strokeStyle='#263528';ctx.lineWidth=1;for(let i=0;i<=N;i++){ctx.beginPath();ctx.moveTo(i*C,0);ctx.lineTo(i*C,600);ctx.stroke();ctx.beginPath();ctx.moveTo(0,i*C);ctx.lineTo(600,i*C);ctx.stroke()}
+ctx.save();ctx.translate(banana.x*C+C/2,banana.y*C+C/2);ctx.font='25px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.shadowColor='#f5c84c';ctx.shadowBlur=12;ctx.fillText('🍌',0,1);ctx.restore();
+dragon.forEach((s,i)=>{const x=s.x*C,y=s.y*C;if(i===0){ctx.save();ctx.translate(x+C/2,y+C/2);if(dir.x===-1)ctx.rotate(Math.PI);else if(dir.y===1)ctx.rotate(Math.PI/2);else if(dir.y===-1)ctx.rotate(-Math.PI/2);
+ctx.fillStyle='#83c95e';round(-13,-12,27,25,10);ctx.fillStyle='#b8e77d';round(-4,-9,17,17,7);
+ctx.fillStyle='#f5e8bc';ctx.beginPath();ctx.moveTo(-8,-10);ctx.lineTo(-14,-20);ctx.lineTo(-2,-13);ctx.fill();ctx.beginPath();ctx.moveTo(7,-10);ctx.lineTo(13,-20);ctx.lineTo(2,-13);ctx.fill();
+ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(6,-5,4,0,Math.PI*2);ctx.fill();ctx.fillStyle='#172018';ctx.beginPath();ctx.arc(7,-5,2,0,Math.PI*2);ctx.fill();ctx.fillStyle='#ef9b63';ctx.beginPath();ctx.arc(13,4,2,0,Math.PI*2);ctx.fill();ctx.restore()
+}else{ctx.fillStyle=i%2?'#438b48':'#5ba653';ctx.beginPath();ctx.arc(x+C/2,y+C/2,11,0,Math.PI*2);ctx.fill();ctx.fillStyle='#a4d66d';ctx.beginPath();ctx.arc(x+C/2-3,y+C/2-4,3,0,Math.PI*2);ctx.fill();if(i%3===0){ctx.strokeStyle='#c0df83';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x+10,y+15);ctx.lineTo(x+15,y+10);ctx.stroke()}}})
+}
+function loop(t){if(!running)return;if(!last)last=t;acc+=Math.min(50,t-last);last=t;while(acc>=step&&running){update();acc-=step}draw();if(running)requestAnimationFrame(loop)}
+document.addEventListener('keydown',e=>{const k=e.key.toLowerCase();const map={arrowup:[0,-1],w:[0,-1],arrowdown:[0,1],s:[0,1],arrowleft:[-1,0],a:[-1,0],arrowright:[1,0],d:[1,0]};if(map[k]){e.preventDefault();setDir(...map[k])}if(k===' '){e.preventDefault();if(running)pause();else if(!over)start()}});
+document.querySelectorAll('[data-dir]').forEach(b=>b.addEventListener('click',()=>{const d=b.dataset.dir;setDir(d==='left'?-1:d==='right'?1:0,d==='up'?-1:d==='down'?1:0)}));
+$('startBtn').addEventListener('click',start);$('pauseBtn').addEventListener('click',()=>running?pause():(!over&&start()));$('restartBtn').addEventListener('click',()=>{reset();show('Ready, dragon?','Collect bananas to grow longer. Avoid the walls and your own tail.','🐉','Start game')});
+reset();
+})();
+</script>
+</body></html>
